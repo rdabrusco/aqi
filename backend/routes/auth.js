@@ -5,7 +5,7 @@ const router = require('express').Router()
 router.post('/signup', Signup)
 router.post('/login', Login)
 router.post('/', userVerification)
-router.post('/', SendAllEmails)
+router.post('/sendAllEmails', SendAllEmails)
 router.put('/editTrackedLocations', EditTrackedLocations)
 router.put('/updateSendEmail', UpdateSendEmail)
 
