@@ -153,6 +153,7 @@ module.exports.SendAllEmails = async () => {
     });
     const users = await User.find({sendEmail: true})
     for(const user of users){
+      if(user.trackedLocations.length === 0) continue;
         const trackedData = await getAllTrackedData(user)
         console.log(trackedData)
         console.log(`sending email to ${user.email}`)
