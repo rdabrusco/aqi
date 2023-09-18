@@ -3,6 +3,8 @@ const { createSecretToken } = require("../utils/secret");
 const bcrypt = require("bcrypt");
 require("dotenv").config({ path: "./config/.env" });
 const jwt = require("jsonwebtoken");
+const emailjs = require('@emailjs/nodejs')
+const axios = require("axios")
 
 module.exports.Signup = async (req, res, next) => {
   try {
