@@ -4,9 +4,6 @@ const cors = require("cors");
 const path = require("path")
 
 
-// TODO: use nodemailer for email automation
-
-
 require("dotenv").config({ path: "./config/.env" });
 
 const cookieParser = require("cookie-parser");
