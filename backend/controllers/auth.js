@@ -8,7 +8,8 @@ const axios = require("axios")
 
 module.exports.Signup = async (req, res, next) => {
   try {
-    const { email, password} = req.body;
+    const { password } = req.body;
+    const email = req.body.email.toLowerCase();
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.json({ message: "User already exists" });
@@ -30,8 +31,8 @@ module.exports.Signup = async (req, res, next) => {
 
 module.exports.Login = async (req, res, next) => {
     try {
-      const { email, password } = req.body;
-      console.log(email, password)
+      const { password } = req.body;
+      const email = req.body.email.toLowerCase();
       if(!email || !password ){
         return res.json({message:'All fields are required'})
       }
