@@ -97,6 +97,49 @@ module.exports.EditTrackedLocations = async (req, res) => {
   
 }
 
+module.exports.EditLocationName = async (req, res) => {
+  const token = req.cookies.token
+  if (!token) {
+    console.log(`no token`)
+    return res.json({ status: false })
+  }
+  jwt.verify(token, process.env.JWT_SECRET, async (err, data) => {
+    if (err) {
+      console.log(`error in jwt`)
+     return res.json({ status: false })
+    } else {
+      try {
+        console.log(req.body)
+        const user = await User.findById(data.id)
+        if(!user){
+          console.log(`no user found`)
+          return res.json({message:'Not logged in/no user found' }) 
+        }
+        const newLocationName = req.body.newLocationName;
+        const location = user.trackedLocations.findIndex(l => l.name === req.body.oldLocationName)
+        user.trackedLocations[location] = {
+          ...user.trackedLocations[location],
+          nickname: newLocationName
+        }
+        const newUpdatedLocationNames = user.trackedLocations
+        // user.trackedLocations[user.trackedLocations.find(l => l.name === req.body.oldLocationName)]['nickname'] = newLocationName
+        console.log(newUpdatedLocationNames)
+        await User.findOneAndUpdate(
+          { _id: data.id},
+          {
+            trackedLocations: newUpdatedLocationNames,
+          }
+        );
+        console.log("Updated tracked locations");
+        res.status(201).json({message: `Successfully updated tracked locations`, trackedLocations: newUpdatedLocationNames});
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  })
+  
+}
+
 module.exports.UpdateSendEmail = async (req, res) => {
   const token = req.cookies.token
   if (!token) {
@@ -144,7 +187,7 @@ function updateArray(arrays, newArray) {
   }
 }
 
-module.exports.SendAllEmails = async () => {
+module.exports.SendAllEmails = async (req, res) => {
 
   
   try{
@@ -168,6 +211,7 @@ module.exports.SendAllEmails = async () => {
           try {
             const response = await emailjs.send('aqi_checker', 'template_jhf575h', templateParams);
             console.log('SUCCESS!', response.status, response.text);
+            res.status(200).json({message: `Successfully sent all emails`});
           } catch (error) {
             console.log('FAILED...', error);
           }
@@ -187,13 +231,15 @@ async function getAllTrackedData(user) {
                   console.log(data)
                   allTrackedData.push({
                       location: location.name,
-                      aqi: data.data.aqi
+                      aqi: data.data.aqi,
+                      nickname: location.nickname
                   })
               } catch(err){
                   console.log(err)
               }
           }
-  
+          console.log(`all tracked data:`)
+          console.log(allTrackedData)
           return allTrackedData
           
   }
@@ -209,7 +255,7 @@ async function getAllTrackedData(user) {
       'bg-hazardous': 'background-color: #7E0023; color: #FFFFFF;',
     };
     // Create table header row using the keys of the first object in the array
-    const keys = Object.keys(data[0]);
+    const keys = ['location', 'aqi'];
     keys.forEach((key) => {
       tableHtml += `<th>${key  === 'location' ? key[0].toUpperCase() + key.slice(1) : "AQI"}</th>`;
     });
@@ -225,7 +271,7 @@ async function getAllTrackedData(user) {
          tableHtml += `<tr style=" ${colorMapping[backgroundColor.split(" ")[0]]};">`;
      
       keys.forEach((key) => {
-        tableHtml += `<td>${item[key]}</td>`;
+        tableHtml += `<td>${key === 'location' && item.nickname ? item.nickname + "/" + item[key] : item[key]}</td>`;
       });
       tableHtml += '</tr>';
     });

@@ -1,4 +1,4 @@
-const { Signup, Login, EditTrackedLocations, UpdateSendEmail, SendAllEmails } = require('../controllers/auth')
+const { Signup, Login, EditTrackedLocations, UpdateSendEmail, SendAllEmails, EditLocationName } = require('../controllers/auth')
 const {userVerification} = require('../middleware/authentication')
 const router = require('express').Router()
 
@@ -7,6 +7,7 @@ router.post('/login', Login)
 router.post('/', userVerification)
 router.post('/sendAllEmails', SendAllEmails)
 router.put('/editTrackedLocations', EditTrackedLocations)
+router.put('/editLocationName', EditLocationName)
 router.put('/updateSendEmail', UpdateSendEmail)
 
 
